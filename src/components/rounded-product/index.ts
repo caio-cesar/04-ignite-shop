@@ -1,0 +1,1 @@
+export { RoundedProduct } from './rounded-product';
