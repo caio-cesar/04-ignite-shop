@@ -13,6 +13,8 @@ import { Handbag } from "phosphor-react";
 import { useDispatch } from "react-redux";
 import { addItemToCart, CartItem } from '../redux/slices/cartSlice';
 import { ProductModel } from "../model/product.model";
+import { NextPageWithLayout } from "./_app";
+import { getDefaultLayout } from "../components/layout/default-layout";
 
 interface ProductProps {
   id: string;
@@ -27,7 +29,7 @@ interface HomeProps {
   products: ProductProps[]
 }
 
-export default function Home({ products }: HomeProps) {
+const Home: NextPageWithLayout = ({ products }: HomeProps) => {
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 3,
@@ -51,26 +53,30 @@ export default function Home({ products }: HomeProps) {
       </Head>
       <HomeContainer ref={sliderRef} className="keen-slider">
         {products.map(product => (
-    
-            <Product className="keen-slider__slide" key={product.id}>
-              <Link href={`/product/${product.id}`} prefetch={false}>
-                <Image src={product.imageUrl} width={520} height={480} alt="" />
-              </Link>
-              <footer>
-                <ProductInformation>
-                  <strong>{product.name}</strong>
-                  <span>{product.price}</span>
-                </ProductInformation>
-                <AddToCartButton onClick={() => addProductToCart(product)}>
-                  <Handbag size={26}/>
-                </AddToCartButton>
-              </footer>
-            </Product>
+
+          <Product className="keen-slider__slide" key={product.id}>
+            <Link href={`/product/${product.id}`} prefetch={false}>
+              <Image src={product.imageUrl} width={520} height={480} alt="" />
+            </Link>
+            <footer>
+              <ProductInformation>
+                <strong>{product.name}</strong>
+                <span>{product.price}</span>
+              </ProductInformation>
+              <AddToCartButton onClick={() => addProductToCart(product)}>
+                <Handbag size={26} />
+              </AddToCartButton>
+            </footer>
+          </Product>
         ))}
       </HomeContainer>
     </>
   )
 }
+
+Home.getLayout = getDefaultLayout;
+
+export default Home;
 
 export const getStaticProps: GetStaticProps = async () => {
   const response = await stripe.products.list({
@@ -91,8 +97,6 @@ export const getStaticProps: GetStaticProps = async () => {
       priceId: price.id
     }
   })
-
-  console.log(response.data);
 
   return {
     props: {

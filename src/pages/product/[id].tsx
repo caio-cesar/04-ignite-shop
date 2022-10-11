@@ -1,12 +1,16 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
 
-import axios from 'axios';
 import Stripe from "stripe";
 import { stripe } from "../../lib/stripe";
 import { ImageContainer, ProductContainer, ProductDetails } from "../../styles/pages/product.styles";
 import { useState } from "react";
 import Head from "next/head";
+import { NextPageWithLayout } from "../_app";
+import { getDefaultLayout } from "../../components/layout/default-layout";
+import { useDispatch } from "react-redux";
+import { addItemToCart } from '../../redux/slices/cartSlice';
+import { ProductModel } from "../../model/product.model";
 
 interface ProductProps {
     product: {
@@ -16,28 +20,22 @@ interface ProductProps {
         price: string;
         description: string;
         defaultPriceId: string;
+        priceAsNumber: number;
+        priceId: string;
     }
 }
 
-export default function Product({ product }: ProductProps) {
+const Product: NextPageWithLayout = ({ product }: ProductProps) => {
     const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
 
-    async function handleBuyProduct() {
-        try {
+    const productModel: ProductModel = {
+        ...product
+    }
 
-            setIsCreatingCheckoutSession(true);
+    const dispatch = useDispatch();
 
-            const response = await axios.post('/api/checkout', {
-                priceId: product.defaultPriceId
-            });
-
-            const { checkoutUrl } = response.data;
-
-            window.location.href = checkoutUrl;
-        } catch (err) {
-            setIsCreatingCheckoutSession(false);
-            alert('Falha ao redirecionar ao checkout !');
-        }
+    const handleAddToCart = () => {
+        dispatch(addItemToCart(productModel));
     }
 
     return (
@@ -56,12 +54,19 @@ export default function Product({ product }: ProductProps) {
 
                     <p>{product.description}</p>
 
-                    <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>Comprar agora</button>
+                    <button 
+                        disabled={isCreatingCheckoutSession} 
+                        onClick={handleAddToCart}>Colocar na sacola
+                    </button>
                 </ProductDetails>
             </ProductContainer>
         </>
     )
 }
+
+Product.getLayout = getDefaultLayout;
+
+export default Product;
 
 export const getStaticPaths: GetStaticPaths = async () => {
     return {
@@ -92,7 +97,9 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({ para
                     currency: 'BRL'
                 }).format(price.unit_amount / 100),
                 description: product.description,
-                defaultPriceId: price.id
+                defaultPriceId: price.id,
+                priceAsNumber: price.unit_amount / 100,
+                priceId: price.id
             }
         },
         revalidate: 60 * 60 * 1

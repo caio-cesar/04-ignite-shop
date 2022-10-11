@@ -49,6 +49,10 @@ export const cartSlice = createSlice({
     },
     toggleCartDrawer: (state) => {
       state.cartDrawerOpen = !state.cartDrawerOpen;
+    },
+    clearCartItems: (state) => {
+      state.cartItems = [];
+      updateState(state);
     }
   },
 })
@@ -67,6 +71,6 @@ function updateState(state: WritableDraft<CartState>): void {
 }
 
 // Action creators are generated for each case reducer function
-export const { addItemToCart, removeItemFromCart, toggleCartDrawer } = cartSlice.actions
+export const { addItemToCart, removeItemFromCart, toggleCartDrawer, clearCartItems } = cartSlice.actions
 
 export default cartSlice.reducer

@@ -1,12 +1,14 @@
 import { RoundedProductContainer } from "./rounded-product.styles";
 import Image from 'next/image';
 
-import camiseta1 from '../../assets/camisetas/camiseta1.png';
+interface RoundedProductProps {
+    imageUrl: string;
+}
 
-export function RoundedProduct() {
+export function RoundedProduct({ imageUrl }: RoundedProductProps) {
     return (
         <RoundedProductContainer>
-            <Image src={camiseta1} width={200} height={200} alt="" />
+            <Image src={imageUrl} width={200} height={200} alt="" />
         </RoundedProductContainer>
     )
 }

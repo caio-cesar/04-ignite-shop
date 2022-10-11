@@ -27,6 +27,10 @@ export const ShoppingCartDrawerCloseButton = styled('button', {
     }
 })
 
+export const ShoppingCartNenhumItemAdicionado = styled('div', {
+    marginTop: '-5rem'
+})
+
 export const ShoppingCartDrawerBody = styled('main', {
     display: 'flex',
     flexDirection: 'column',

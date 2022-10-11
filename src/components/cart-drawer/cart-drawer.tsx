@@ -17,7 +17,8 @@ import {
     SpanQuantidade,
     SpanTotal,
     SpanTotalItens,
-    SpanValorTotal
+    SpanValorTotal,
+    ShoppingCartNenhumItemAdicionado
 } from "./cart-drawer.styles";
 import { formatPrice } from '../../util/priceFormatter';
 
@@ -53,33 +54,50 @@ export function CartDrawer() {
             size={480}>
 
             <ShoppingCartDrawerContainer>
+
                 <ShoppingCartDrawerHeader>
                     <ShoppingCartDrawerCloseButton onClick={closeDrawer}>
                         <X size={24} />
                     </ShoppingCartDrawerCloseButton>
                 </ShoppingCartDrawerHeader>
-                <ShoppingCartDrawerBody>
-                    <h1>Sacola de compras</h1>
-                    <CartIconList />
-                </ShoppingCartDrawerBody>
+                
+                {cartItems.length == 0 && (
+                    <>
+                    <ShoppingCartNenhumItemAdicionado>
+                        <h1>Nenhum item na sacola de compras !</h1>
+                    </ShoppingCartNenhumItemAdicionado>
+                    <div></div>
+                    <div></div>
+                    </>
+                )}
 
-                <ShoppingCartDrawerFooter>
-                    <ShoppingCartSummary>
-                        <SpanQuantidade>Quantidade</SpanQuantidade>
-                        <SpanTotalItens>
-                            {totalItems}
-                            {' '}
-                            {totalItems > 1 ? 'itens' : 'item'}
-                        </SpanTotalItens>
+                {cartItems && cartItems.length > 0 && (
+                    <>
+                        <ShoppingCartDrawerBody>
+                            <h1>Sacola de compras</h1>
+                            <CartIconList />
+                        </ShoppingCartDrawerBody>
 
-                        <SpanTotal>Valor total</SpanTotal>
-                        <SpanValorTotal>{formatPrice(total)}</SpanValorTotal>
-                    </ShoppingCartSummary>
+                        <ShoppingCartDrawerFooter>
+                            <ShoppingCartSummary>
+                                <SpanQuantidade>Quantidade</SpanQuantidade>
+                                <SpanTotalItens>
+                                    {totalItems}
+                                    {' '}
+                                    {totalItems > 1 ? 'itens' : 'item'}
+                                </SpanTotalItens>
 
-                    <ButtonFinalizarCompra onClick={handleFinalizarCompra}>
-                        Finalizar Compra
-                    </ButtonFinalizarCompra>
-                </ShoppingCartDrawerFooter>
+                                <SpanTotal>Valor total</SpanTotal>
+                                <SpanValorTotal>{formatPrice(total)}</SpanValorTotal>
+                            </ShoppingCartSummary>
+
+                            <ButtonFinalizarCompra onClick={handleFinalizarCompra}>
+                                Finalizar Compra
+                            </ButtonFinalizarCompra>
+                        </ShoppingCartDrawerFooter>
+                    </>
+                )}
+
             </ShoppingCartDrawerContainer>
         </Drawer>
     )

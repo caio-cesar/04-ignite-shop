@@ -1,21 +1,43 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import Stripe from "stripe";
 import { RoundedProduct } from "../components/rounded-product";
 import { stripe } from "../lib/stripe";
-import { ImageContainer, ItemsContainer, SuccessContainer } from "../styles/pages/success.styles";
+import { ItemsContainer, SuccessContainer } from "../styles/pages/success.styles";
+import { clearCartItems, toggleCartDrawer } from '../redux/slices/cartSlice';
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 
 interface SuccessProps {
     customerName: string;
-    product: {
+    products: [{
         name: string;
-        imageUrl: string;
-    }
+        imageUrl: string;  
+    }]
 }
 
-export default function Success() {
+export default function Success({ customerName, products }: SuccessProps) {
+    
+    const dispatch = useDispatch();
+
+    const handleClearCartItems = () => {
+        dispatch(clearCartItems());
+    }
+
+    const handleToggleDrawer = () => {
+        dispatch(toggleCartDrawer());
+    }
+
+    useEffect(() => {
+        handleClearCartItems();
+    }, [])
+
+    
+    useEffect(() => {
+        handleToggleDrawer();
+    }, [])
+
     return (
         <>
             <Head>
@@ -24,13 +46,13 @@ export default function Success() {
             </Head>
             <SuccessContainer>
                 <ItemsContainer>
-                    <li><RoundedProduct /></li>
-                    <li><RoundedProduct /></li>
-                    <li><RoundedProduct /></li>
+                    {
+                        products.map(product => <li key={product.name}><RoundedProduct imageUrl={product.imageUrl}/></li>)
+                    }
                 </ItemsContainer>
                 
                 <h1>Compra efetuada!</h1>
-                <p>Uhull, Caio César, suas camisetas já estão a caminho.</p>
+                <p>Uhull, {customerName}, suas camisetas já estão a caminho.</p>
             
                 <Link href="/">
                     Voltar ao catálogo
@@ -39,9 +61,8 @@ export default function Success() {
         </>
     )
 }
-/* 
-export const getServerSideProps: GetServerSideProps = async ({ query, params }) => {
 
+export const getServerSideProps: GetServerSideProps = async ({ query, params }) => {
 
     if (!query.session_id) {
         return {
@@ -59,15 +80,19 @@ export const getServerSideProps: GetServerSideProps = async ({ query, params }) 
     });
 
     const customerName = session.customer_details.name;
-    const product = session.line_items.data[0].price.product as Stripe.Product
+    
+    const products = session.line_items.data.map(data => {
+        let product = data.price.product as Stripe.Product;
+        return {
+        name: product.name,
+        imageUrl: product.images[0]
+        }
+    });
 
     return {
         props: {
             customerName,
-            product: {
-                name: product.name,
-                imageUrl: product.images[0]
-            }
+            products: products
         }
     }
-} */
+}
